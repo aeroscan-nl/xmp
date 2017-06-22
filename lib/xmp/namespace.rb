@@ -21,15 +21,23 @@ class XMP
     end
 
     def inspect
-      "#<XMP::Namespace:#{@namespace}>"
+      "#<XMP::Namespace:#{@namespace} (#{attributes.join(", ")})>"
     end
 
     def method_missing(method, *args)
       if has_attribute?(method)
-        embedded_attribute(method) || standalone_attribute(method)
+        self[method]
       else
         super
       end
+    end
+
+    def [](name)
+      embedded_attribute(name) || standalone_attribute(name)
+    end
+
+    def has_attribute?(name)
+      attributes.include?(name.to_s)
     end
 
     def respond_to?(method)
@@ -44,10 +52,6 @@ class XMP
       element.attribute(name.to_s).text
     end
 
-    def has_attribute?(name)
-      attributes.include?(name.to_s)
-    end
-
     def standalone_attribute(name)
       attribute_xpath = "//#{@namespace}:#{name}"
       attribute = xml.xpath(attribute_xpath).first
@@ -58,7 +62,7 @@ class XMP
         items = array_value.xpath("./rdf:li")
         items.map { |i| i.text }
       else
-        raise "Don't know how to handle: \n" + attribute.to_s
+        attribute.text
       end
     end
 

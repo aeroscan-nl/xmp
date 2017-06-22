@@ -37,6 +37,18 @@ class XMP
     "#<XMP:@namespaces=#{@namespaces.inspect}>"
   end
 
+  def get(str)
+    ns, attrib = str.split(/[\.:\/\\]/, 2)
+    if has_namespace?(ns)
+      namespace = Namespace.new(self, ns)
+      return namespace if attrib.nil?
+      return namespace[attrib] if namespace.has_attribute?(attrib)
+    end
+    nil
+  end
+
+  alias :[] :get
+
   # returns Namespace object if namespace exists, otherwise tries to call a method
   def method_missing(namespace, *args)
     if has_namespace?(namespace)
