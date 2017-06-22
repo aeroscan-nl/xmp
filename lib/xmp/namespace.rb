@@ -7,6 +7,7 @@ class XMP
       @xmp = xmp
       @namespace = namespace.to_s
 
+      @attribute_map = {}
       @attributes = []
       embedded_attributes =
         xml.xpath("//rdf:Description").map { |d|
@@ -18,10 +19,11 @@ class XMP
       standalone_attributes = xml.xpath("//rdf:Description/#{@namespace}:*").
                                   map(&:name)
       @attributes.concat standalone_attributes
+      map_attributes @attributes
     end
 
     def inspect
-      "#<XMP::Namespace:#{@namespace} (#{attributes.join(", ")})>"
+      "#<XMP::Namespace:#{@namespace} (#{attributes.inspect})>"
     end
 
     def method_missing(method, *args)
@@ -33,11 +35,13 @@ class XMP
     end
 
     def [](name)
-      embedded_attribute(name) || standalone_attribute(name)
+      name = name.to_s.downcase
+      raise "Unknown attribute" unless has_attribute?(name)
+      embedded_attribute(@attribute_map[name]) || standalone_attribute(@attribute_map[name])
     end
 
     def has_attribute?(name)
-      attributes.include?(name.to_s)
+      @attribute_map.key?(name.to_s.downcase)
     end
 
     def respond_to?(method)
@@ -45,6 +49,12 @@ class XMP
     end
 
     private
+
+    def map_attributes(attrs)
+      attrs.each do |attr_name|
+        @attribute_map[attr_name.downcase] = attr_name
+      end
+    end
 
     def embedded_attribute(name)
       element = xml.at("//rdf:Description[@#{@namespace}:#{name}]")
