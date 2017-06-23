@@ -12,7 +12,7 @@ class XMP
       embedded_attributes =
         xml.xpath("//rdf:Description").map { |d|
           d.attributes.values.
-            select { |attr| attr.namespace.prefix.to_s == @namespace }.
+            select { |attr| attr.namespace ? attr.namespace.prefix.to_s : nil == @namespace }.
             map(&:name)
         }.flatten
       @attributes.concat embedded_attributes
