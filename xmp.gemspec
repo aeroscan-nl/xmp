@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'nokogiri', '>= 1.5.0'
 
-  s.add_development_dependency 'exifr', '>=1.0.4'
-  s.add_development_dependency 'rspec', '~>2.0'
+  s.add_development_dependency 'exifr', '>=1.4.0'
+  s.add_development_dependency 'rspec', '~>3.12'
   s.add_development_dependency 'rake'
 end
